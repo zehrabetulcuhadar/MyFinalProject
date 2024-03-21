@@ -1,0 +1,19 @@
+/* UniqueDashboardNavbar.css */
+
+/* Bu CSS sınıfları sadece UniqueDashboardNavbar komponenti için geçerli olacak */
+
+.unique-navbar-toggler {
+    display: flex; /* Her zaman göster */
+  }
+  
+/* Navbar'ı üstte sabitlemek ve tam genişlikte göstermek için ek stiller */
+.unique-navbar {
+  width: 100%;
+  height: 70px;
+  z-index: 1030;
+}
+
+/* UniqueDashboardNavbar.css dosyanızda z-index değerlerini kontrol edin ve uygun şekilde ayarlayın */
+.unique-navbar {
+  z-index: 1030; /* Submenu'den daha yüksek olmalı */
+}

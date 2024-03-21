@@ -1,0 +1,9 @@
+.copyright-bar {
+    background-color: #333; /* Koyu arka plan rengi */
+    color: #fff; /* Beyaz yazı rengi */
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    width: 100%;
+  }
+  

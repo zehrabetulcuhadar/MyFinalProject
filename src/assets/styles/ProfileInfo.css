@@ -1,0 +1,114 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f7f7f7;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px; /* Adjust based on your preference */
+  margin: 20px auto;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px; /* Make the image a perfect circle */
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px; /* Space below the profile picture */
+}
+
+.user-details {
+  width: 100%;
+}
+
+.user-details h2, .user-details p {
+  margin: 0;
+  padding: 5px 0;
+}
+
+.user-details input {
+  width: calc(100% - 78px); /* Full width minus padding */
+  padding: 10px;
+  margin-bottom: 10px; /* Space between inputs */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.user-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Add responsive behavior */
+@media (max-width: 768px) {
+  .profile-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .profile-picture {
+    align-self: center; /* Center profile picture */
+    margin-bottom: 20px; /* Increase space below profile picture */
+  }
+
+  .user-details {
+    order: 2; /* Ensure that user details come after profile picture */
+  }
+  
+  .user-actions {
+    order: 3; /* Ensure actions come last */
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .btn {
+    padding: 8px 12px; /* Smaller padding on mobile */
+  }
+}

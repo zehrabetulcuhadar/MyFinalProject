@@ -1,0 +1,83 @@
+.auth-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  h2 {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px; /* Başlık altındaki boşluk */
+  }
+  
+  Form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px; /* Formun maksimum genişliği */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Kutu gölgesi */
+    padding: 20px;
+    border-radius: 20px; /* Kenar yuvarlaklığı */
+    background: white;
+  }
+  
+  .field-input {
+    padding: 10px;
+    margin-bottom: 10px; /* Her bir input arasındaki boşluk */
+    border: 1px solid #ccc; /* Border rengi */
+    border-radius: 4px; /* Input kenar yuvarlaklığı */
+    outline-color: #4A90E2; /* Focus halinde kenarlık rengi */
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 10px; /* Hata mesajı altındaki boşluk */
+  }
+  
+  button[type="submit"] {
+    padding: 10px;
+    background-color: #4A90E2; /* Buton arka plan rengi */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Buton kenar yuvarlaklığı */
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px; /* Buton üstündeki boşluk */
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #357ABD; /* Buton hover arka plan rengi */
+  }
+  
+  button[type="button"], .password-reset {
+    background: none;
+    text-decoration: none;
+    font-size: 15px;
+    border: none;
+    color: #4A90E2; /* Link-benzeri buton rengi */
+    padding: 10px;
+    margin-top: 20px; /* Link-benzeri buton üstündeki boşluk */
+    cursor: pointer;
+  }
+  
+  button[type="button"]:hover, .password-reset:hover{
+    text-decoration: underline; /* Hover halinde altı çizili */
+  }
+  
+
+  @media (max-width: 768px) {
+    .auth-form-container {
+      padding: 10px;
+    }
+  
+    Form {
+      width: calc(100% - 20px); /* Yatay padding dahil ekranın tam genişliği */
+    }
+  }
+  

@@ -1,0 +1,31 @@
+.notes-container {
+  padding: 20px;
+  margin: 100px 40px 40px 40px;
+}
+
+.notes-input-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-display-area {
+  max-height: 500px; /* Maksimum yükseklik */
+  overflow-y: auto; /* Dikey kaydırma çubuğu */
+}
+
+.text-area-custom {
+  height: 150px; /* Sabit yükseklik */
+  resize: none; /* Kullanıcının textarea'yı yeniden boyutlandırmasını engelle */
+}
+
+.note-card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Kartlara hafif bir gölge efekti */
+}
+
+@media (max-width: 768px) {
+  /* Tablet ve altı ekran boyutları için */
+  .notes-input-area,
+  .notes-display-area {
+    margin: 2px;
+  }
+}

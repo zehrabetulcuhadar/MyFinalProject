@@ -1,0 +1,72 @@
+/* Navbar genel stil */
+.navbar {
+  background-color: #F7F8FC ; /* Örnek bir arkaplan rengi */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hafif bir gölge */
+  min-height: 90px;
+}
+
+/* Navbar markası için stil 
+.navbar-brand {
+  
+}
+*/
+
+/* Toggle butonu için stil */
+.navbar-toggler {
+  border: none; /* Kenarlık kaldırılıyor */
+  font-size: 1.2rem; /* İkon boyutu */
+}
+
+/* İkonun içindeki bar stil */
+.fa-bars {
+  color: #333; /* İkon rengi */
+}
+
+/* Navbar linkleri için stil */
+.nav-link {
+  color: #555; /* Link rengi */
+  font-size: 1.1rem; /* Link font boyutu */
+  margin: 5px 10px; /* Linkler arası boşluk */
+  transition: 0.2s;
+}
+
+.nav-link:hover {
+  color: #AD7BE9;
+}
+
+/* Aktif link için stil */
+.nav-link.active {
+  color: #007bff; /* Aktif link rengi */
+  font-weight: bold; /* Aktif link kalın yazı */
+}
+
+/* Dropdown menüsü için stil */
+.dropdown-menu {
+  background-color: #f8f9fa; /* Dropdown arkaplan rengi */
+}
+
+/* Dropdown linkleri için stil */
+.dropdown-item {
+  color: #555; /* Dropdown link rengi */
+}
+
+/* Açılır menü ayracı için stil */
+.dropdown-divider {
+  border-top: 1px solid #e9ecef; /* Ayracın rengi */
+}
+
+/* Genişletilmiş menü için stil */
+.expanded {
+  display: flex; /* Genişletildiğinde menüyü göster */
+}
+
+/* Container genel stil */
+.container {
+  padding: 0 15px; /* İçerik için sağdan ve soldan boşluk */
+}
+
+@media (max-width: 991px) {
+  .navbar {
+    min-height: 60px; /* Küçük ekranlar için Navbar yüksekliği */
+  }
+}

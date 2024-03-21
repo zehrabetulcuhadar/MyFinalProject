@@ -1,0 +1,93 @@
+.calendar-container {
+  
+  margin-bottom: 30px; /* Sayfa altındaki boşluk */
+  padding: 0;
+  width: 80%; /* Genişlik olarak sayfanın %80'i */
+  box-sizing: border-box;
+  /* Takvimin ortalanmasını sağlar */
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Takvimi başlıkla beraber kapsayan container stilini özelleştir */
+.fc {
+  border-radius: 10px; /* Takvimin kenarlarını yuvarlak yap */
+}
+
+.fc .fc-scrollgrid {
+  overflow: hidden; /* Scroll bar kaldırıldı */
+  border-radius: 10px;
+  background-color: rgb(21, 32, 61);
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  text-align: center; /* Başlığı ortala */
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.5em; /* Başlık font boyutu */
+  padding: 10px 0; /* Başlık için üst ve alt padding */
+}
+
+.fc .fc-daygrid-day-frame {
+  padding: 2px; /* Hücre içeriğine padding */
+  background-color: rgba(21, 32, 61, 0.395);
+}
+
+.fc .fc-daygrid-day-number {
+  color: #b4bac0; /* Gün numarası rengi */
+  text-decoration: none; /* Alt çizgileri kaldır */
+}
+
+.fc .fc-daygrid-day-events {
+  margin-top: 2px; /* Olay gösterimleri için üstten boşluk */
+}
+
+.fc .fc-daygrid-day-top {
+  justify-content: center; /* Gün başlıklarını ortala */
+  color: #ff8f8f; /* Başlık rengi */
+  font-weight: bold; /* Başlık font kalınlığı */
+}
+
+/* Takvimdeki etkinlik göstergesini özelleştir */
+.event-dot {
+  width: 10px; /* Etkinlik göstergesi genişliği */
+  height: 10px; /* Etkinlik göstergesi yüksekliği */
+  border-radius: 5px; /* Etkinlik göstergesi yuvarlaklık */
+  margin-top: 5px; /* Üstten boşluk */
+}
+
+.fc .fc-col-header-cell-cushion {
+  text-decoration: none; /* Remove underline */
+  color: #e1e4e8; /* Change text color */
+  font-weight: bold; /* Make text bold */
+  text-align: center; /* Center text */
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    width: calc(100% - 20px); /* Ekranın %100'ü - 20px (10px'lik sağ ve sol padding) */
+    
+    margin-left: auto;
+    margin-right: auto;
+    left: initial; /* 'left' ve 'transform' özelliklerini sıfırla */
+    transform: initial;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.2em; /* Mobil için başlık boyutu */
+  }
+
+  .fc .fc-toolbar.fc-header-toolbar {
+    padding: 0; /* Mobil için toolbar padding kaldırıldı */
+  }
+
+  .fc .fc-daygrid-day-frame {
+    padding: 1px; /* Mobil için hücre padding azaltıldı */
+  }
+
+  .fc .fc-scrollgrid {
+    overflow: visible; /* Mobil cihazlarda scroll'a izin ver, gerekiyorsa */
+  }
+}

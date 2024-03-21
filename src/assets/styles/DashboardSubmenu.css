@@ -1,0 +1,38 @@
+/* DashboardSubmenu.css */
+.submenu-container {
+    width: 100%;
+    height: 50px; /* Submenu'nün yüksekliği */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Alt gölge efekti */
+    background-color: #faf8f8; /* Submenu arka plan rengi */
+    z-index: 1020; /* Navbar'dan hemen sonra gelen z-index değeri */
+    display: flex; /* Flexbox ile içerikleri hizala */
+    align-items: center; /* İçeriği dikey olarak ortala */
+    justify-content: center; /* İçeriği yatay olarak ortala */
+  }
+  
+  .submenu-navbar {
+    width: 100%; /* Genişlik %100, Container genişliğiyle uyumlu */
+    display: flex; /* Flexbox ile içerikleri hizala */
+    justify-content: center; /* İçeriği yatay olarak ortala */
+    padding: 0; /* Varsayılan padding'i sıfırla */
+  }
+  
+  .submenu-navbar .nav-item {
+    display: flex; /* Flexbox ile hizalama */
+  }
+  
+  .submenu-navbar .nav-link {
+    color: #007bff; /* Bootstrap link rengi */
+    display: flex; /* Flexbox ile hizalama */
+    align-items: center; /* Dikey olarak ortala */
+    justify-content: center; /* Yatay olarak ortala */
+    padding: 0.5rem 1rem; /* Yeterli boşluk sağla */
+    height: 100%; /* Yüksekliği submenu-container'a uydur */
+  }
+  
+  @media (max-width: 768px) {
+    .submenu-container {
+      top: 0px; /* Mobil cihazlarda navbar yüksekliği */
+    }
+  }
+  

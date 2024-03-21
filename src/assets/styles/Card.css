@@ -1,0 +1,20 @@
+.custom-primary {
+    background-color: #1B1A55;
+    border: none;
+    font-size: 40px;
+  }
+  .custom-secondary {
+    background-color: #1B1A55;
+    border: none;
+    font-size: 20px;
+  }
+  .custom-success {
+    background-color: #535C91;
+    border: none;
+    font-size: 20px;
+  }
+  .custom-danger {
+    background-color: #070F2B;
+    border: none;
+    font-size: 20px;
+  }
