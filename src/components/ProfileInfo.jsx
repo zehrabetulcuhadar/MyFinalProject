@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from './../firebaseConfig'; 
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc, collection, query, getDocs } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"; 
-import { updatePassword, signOut, deleteUser } from "firebase/auth";
+import { updatePassword, signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import "./../assets/styles/ProfileInfo.css";
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const ProfileInfo = ({ userId }) => {
   const navigate = useNavigate();
 
-  // Giriş yapan kullanıcının bilgilerini Firebase'den al
   const [userInfo, setUserInfo] = useState({
     name: '',
     surname: '',
     email: '',
-    profilePicture: '', // Profil fotoğrafı URL'si
-    hasProfilePicture: false, // Profil fotoğrafı olup olmadığını kontrol etmek için
-    newPassword: '', // Yeni şifre için alan
-    currentPassword: '' // Mevcut şifreyi doğrulama için alan (eğer gerekirse)
+    profilePicture: '',
+    hasProfilePicture: false, 
+    newPassword: '', 
+    currentPassword: ''
   });
 
   const defaultProfilePictureUrl = '/user.png';
-
-  // Kullanıcının düzenleme modunda olup olmadığını takip eden state
   const [isEditing, setIsEditing] = useState(false);
+  const [documentId, setDocumentId] = useState(null);
+  const [editSection, setEditSection] = useState('');
 
   const showToast = (message, type = "info") => {
     toast[type](message, {
@@ -46,16 +46,15 @@ const ProfileInfo = ({ userId }) => {
     }
     const storage = getStorage();
     const userImageRef = storageRef(storage, `profilePictures/${userId}`);
-  
+
     try {
       const snapshot = await uploadBytes(userImageRef, file);
       const photoURL = await getDownloadURL(snapshot.ref);
-      // Firestore'da kullanıcının profil bilgilerini güncelle
-      const userProfileRef = doc(db, 'users', userId, 'profile', 'profileDocument');
+      const userProfileRef = doc(db, 'users', userId, 'profile', documentId);
       await updateDoc(userProfileRef, {
         profilePicture: photoURL
       });
-      setUserInfo({ ...userInfo, profilePicture: photoURL });
+      setUserInfo({ ...userInfo, profilePicture: photoURL, hasProfilePicture: true });
       console.log("Profil fotoğrafı başarıyla yüklendi ve güncellendi!");
     } catch (error) {
       console.error("Profil fotoğrafı yükleme hatası:", error);
@@ -67,34 +66,43 @@ const ProfileInfo = ({ userId }) => {
       console.log('No userId provided');
       return;
     }
-    const userDocRef = doc(db, 'users', userId, 'profile', 'profileDocument');
-  
-    getDoc(userDocRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        setUserInfo(prevState => ({
-          ...prevState,
-          ...userData,
-          hasProfilePicture: !!userData.profilePicture // Eğer profil resmi URL'si varsa, true değerini ata
-        }));
+
+    const fetchUserProfile = async () => {
+      const profileCollectionRef = collection(db, 'users', userId, 'profile');
+      const profileQuery = query(profileCollectionRef);
+      const profileSnapshot = await getDocs(profileQuery);
+
+      if (!profileSnapshot.empty) {
+        const docId = profileSnapshot.docs[0].id;
+        setDocumentId(docId);
+
+        const userProfileRef = doc(db, 'users', userId, 'profile', docId);
+        const docSnap = await getDoc(userProfileRef);
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setUserInfo({
+            ...userData,
+            hasProfilePicture: !!userData.profilePicture
+          });
+        } else {
+          console.log('No such document!');
+        }
       } else {
-        console.log('No such document!');
+        console.log('No profile documents found!');
       }
-    }).catch(error => {
-      console.error('Error fetching user document:', error);
-    });
+    };
+
+    fetchUserProfile();
   }, [userId]);
-    
-  // Input alanlarındaki değişiklikleri işleyen fonksiyon
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserInfo({ ...userInfo, [name]: value });
   };
 
   const handleProfilePictureChange = (event) => {
-    // ... Profil fotoğrafı yükleme işlemleri
     handleProfilePictureUpload(event);
-    // Yükleme başarılı olduktan sonra
     setUserInfo(prevState => ({
       ...prevState,
       hasProfilePicture: true
@@ -105,78 +113,65 @@ const ProfileInfo = ({ userId }) => {
     const user = auth.currentUser;
     if (user) {
       try {
-        // Firebase Storage'dan profil resmini sil
         const storage = getStorage();
         const profilePicRef = storageRef(storage, `profilePictures/${userId}`);
-        await deleteObject(profilePicRef); // Bu kısım Firebase Storage'dan resmi siler
+        
+        // Dosyanın var olup olmadığını kontrol et
+        await getDownloadURL(profilePicRef);
+
+        await deleteObject(profilePicRef);
   
-        // Firestore'daki kullanıcı profilinden profil resmi URL'sini sil veya varsayılan URL'ye ayarla
-        const userProfileRef = doc(db, 'users', user.uid, 'profile', 'profileDocument');
+        const userProfileRef = doc(db, 'users', user.uid, 'profile', documentId);
         await updateDoc(userProfileRef, {
-          profilePicture: defaultProfilePictureUrl // Varsayılan profil resmi URL'si veya boş string
+          profilePicture: defaultProfilePictureUrl
         });
   
-        // Kullanıcı bilgilerini güncelle
         setUserInfo({ ...userInfo, profilePicture: defaultProfilePictureUrl, hasProfilePicture: false });
         showToast('Profil resmi başarıyla kaldırıldı.', 'success');
       } catch (error) {
-        console.error("Profil resmi silme hatası:", error);
-        showToast("Profil resmi silme hatası: " + error.message, 'error');
+        if (error.code === 'storage/object-not-found') {
+          console.log('Profil resmi bulunamadı, zaten kaldırılmış.');
+          showToast('Profil resmi bulunamadı.', 'info');
+        } else {
+          console.error("Profil resmi silme hatası:", error);
+          showToast("Profil resmi silme hatası: " + error.message, 'error');
+        }
       }
     }
   };
 
-  // Kullanıcı düzenleme moduna girdiğinde yeni profil fotoğrafı seçebilsin diye bir input alanı gösterilecek
-  const renderProfilePictureEditSection = () => {
-    return (
-      <>
-        {isEditing && (
-          <>
-            <input type="file" onChange={handleProfilePictureChange} />
-            {/* Yüklenmiş bir resim varsa göster */}
-            {userInfo.hasProfilePicture && (
-              <img src={userInfo.profilePicture} alt="Profile" className="profile-picture"/>
-            )}
-            {/* Profil resmi kaldırma butonu */}
-            <button onClick={handleRemoveProfilePicture} className="btn btn-danger">Profil Resmini Kaldır</button>
-          </>
-        )}
-        {!isEditing && (
-          <img src={userInfo.profilePicture || defaultProfilePictureUrl} alt="Profile" className="profile-picture"/>
-        )}
-      </>
-    );
+  const handleSaveUserInfo = async () => {
+    const userProfileRef = doc(db, 'users', userId, 'profile', documentId);
+    try {
+      await updateDoc(userProfileRef, {
+        name: userInfo.name,
+        surname: userInfo.surname
+      });
+      showToast('Kullanıcı adı başarıyla güncellendi.', 'success');
+      setIsEditing(false);
+      setEditSection('');
+    } catch (error) {
+      showToast("Güncelleme sırasında bir hata oluştu: " + error.message, 'error');
+    }
   };
 
-
-  // Düzenlemeleri kaydeden fonksiyon
-  const handleSave = async () => {
+  const handleSavePassword = async () => {
     const user = auth.currentUser;
-    if (user) {
-      // Firestore'da kullanıcının profil bilgilerini güncelle
-      const userProfileRef = doc(db, 'users', user.uid, 'profile', 'profileDocument');
-      try {
-        await updateDoc(userProfileRef, {
-          name: userInfo.name,
-          surname: userInfo.surname,
-          email: userInfo.email,
-          // profilePicture alanını da burada güncelleyebilirsiniz
-        });
+    if (!user) return;
 
-        // Eğer şifre alanı doluysa, kullanıcının şifresini güncelle
-        if (userInfo.newPassword) {
-          await updatePassword(user, userInfo.newPassword);
-          showToast('Bilgiler ve şifre başarıyla güncellendi.', 'success');
-        } else {
-          showToast('Bilgiler başarıyla güncellendi.', 'success');
-        }
+    const credentials = EmailAuthProvider.credential(user.email, userInfo.currentPassword);
+    try {
+      await reauthenticateWithCredential(user, credentials);
 
-        // Düzenleme modunu kapat
-        setIsEditing(false);
-      } catch (error) {
-        console.error("Profil güncelleme hatası", error);
-        showToast("Profil güncelleme hatası: " + error.message, 'error');
+      if (userInfo.newPassword) {
+        await updatePassword(user, userInfo.newPassword);
+        showToast('Şifre başarıyla güncellendi.', 'success');
       }
+
+      setIsEditing(false);
+      setEditSection('');
+    } catch (error) {
+      showToast("Güncelleme sırasında bir hata oluştu. Mevcut şifre yanlış: " + error.message, 'error');
     }
   };
 
@@ -190,63 +185,160 @@ const ProfileInfo = ({ userId }) => {
   };
 
   const handleDeleteAccount = async () => {
-    const confirm = window.confirm("Hesabı silmek istediğinizden emin misiniz?");
-    if (confirm) {
-      const user = auth.currentUser;
-      if (!user) {
-        alert('Kullanıcı bilgisi bulunamadı.');
-        return;
-      }
-  
-      const storage = getStorage();
-      const userProfileRef = doc(db, 'users', user.uid);
-      const profilePicPath = `profilePictures/${user.uid}`;
-      const profilePicRef = storageRef(storage, profilePicPath);
-  
-      try {
-        // Profil resmini silme işlemi
-        if (userInfo.profilePicture && userInfo.profilePicture !== defaultProfilePictureUrl) {
-          await deleteObject(profilePicRef);
+    Swal.fire({
+      title: 'Hesabı Silmek İstediğinizden Emin Misiniz?',
+      text: "Bu işlemi geri alamazsınız!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Evet, Sil!',
+      cancelButtonText: 'İptal',
+      input: 'password',
+      inputPlaceholder: 'Mevcut Şifrenizi Girin',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      preConfirm: async (password) => {
+        if (!password) {
+          Swal.showValidationMessage('Mevcut şifre gerekli');
+          return;
         }
-  
-        // Firestore'dan kullanıcı verilerini sil
-        await deleteDoc(userProfileRef);
-  
-        // Firebase Authentication'dan kullanıcıyı sil
-        await deleteUser(user);
-        
-        // Kullanıcıya uyarı göster ve anasayfaya yönlendir
-        showToast("Hesabınız başarıyla silindi.", 'success');
-        navigate('/');
-      } catch (error) {
-        console.error("Hesap silme hatası:", error);
-        showToast("Hesap silme hatası: " + error.message, 'error');
-        // Kullanıcıyı anasayfaya yönlendir
-        navigate('/');
-      }
-    }
-  };
- 
-  
 
+        const user = auth.currentUser;
+        const credentials = EmailAuthProvider.credential(user.email, password);
+        try {
+          await reauthenticateWithCredential(user, credentials);
+          return true;
+        } catch (error) {
+          Swal.showValidationMessage('Mevcut şifre yanlış');
+          return false;
+        }
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const user = auth.currentUser;
+        if (!user) {
+          Swal.fire(
+            'Hata',
+            'Kullanıcı bilgisi bulunamadı.',
+            'error'
+          );
+          return;
+        }
+    
+        const storage = getStorage();
+        const userProfileRef = doc(db, 'users', user.uid, 'profile', documentId);
+        const profilePicPath = `profilePictures/${user.uid}`;
+        const profilePicRef = storageRef(storage, profilePicPath);
+    
+        try {
+          if (userInfo.profilePicture && userInfo.profilePicture !== defaultProfilePictureUrl) {
+            await deleteObject(profilePicRef);
+          }
+    
+          await deleteDoc(userProfileRef);
+    
+          await deleteUser(user);
+          
+          Swal.fire(
+            'Başarılı!',
+            'Hesabınız başarıyla silindi.',
+            'success'
+          );
+          navigate('/');
+        } catch (error) {
+          console.error("Hesap silme hatası:", error);
+          Swal.fire(
+            'Hata',
+            'Hesap silme hatası: ' + error.message,
+            'error'
+          );
+          navigate('/');
+        }
+      }
+    });
+  };
+
+  const renderProfilePictureEditSection = () => {
+    return (
+      <div className="edit-section">
+        {isEditing && editSection === 'profilePicture' && (
+          <div className='edit-profile-picture'>
+            {userInfo.hasProfilePicture && (
+              <img src={userInfo.profilePicture} alt="Profile" className="profile-picture" />
+            )}
+            <div className="buttons">
+              <label className="file-input">
+                Dosya Seç
+                <input type="file" onChange={handleProfilePictureChange} />
+              </label>
+              <button onClick={handleRemoveProfilePicture} className="btn btn-danger">Profil Resmini Kaldır</button>
+              <button onClick={() => setEditSection('')} className="btn btn-secondary">İptal</button>
+            </div>
+          </div>
+        )}
+        {!isEditing && (
+          <img src={userInfo.profilePicture || defaultProfilePictureUrl} alt="Profile" className="profile-picture" />
+        )}
+      </div>
+    );
+  };
+
+  const renderUsernameEditSection = () => {
+    return (
+      <div className="edit-section">
+        {isEditing && editSection === 'username' && (
+          <>
+            <input type="text" name="name" placeholder="Ad" value={userInfo.name} onChange={handleChange} className="form-control mb-2" />
+            <input type="text" name="surname" placeholder="Soyad" value={userInfo.surname} onChange={handleChange} className="form-control mb-2" />
+            <button onClick={handleSaveUserInfo} className="btn btn-success me-2">Kaydet</button>
+            <button onClick={() => setEditSection('')} className="btn btn-secondary">İptal</button>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const renderPasswordEditSection = () => {
+    return (
+      <div className="edit-section">
+        {isEditing && editSection === 'password' && (
+          <>
+            <input type="password" name="currentPassword" placeholder="Mevcut Şifre" value={userInfo.currentPassword || ''} onChange={handleChange} className="form-control mb-2" />
+            <input type="password" name="newPassword" placeholder="Yeni Şifre" value={userInfo.newPassword || ''} onChange={handleChange} className="form-control mb-2" />
+            <button onClick={handleSavePassword} className="btn btn-success me-2">Kaydet</button>
+            <button onClick={() => setEditSection('')} className="btn btn-secondary">İptal</button>
+          </>
+        )}
+      </div>
+    );
+  };
+  
   return (
     <div className="profile-page">
-      <div className="profile-container">
-      {renderProfilePictureEditSection()}
+      <ToastContainer />
+      <div className={`profile-container ${isEditing ? 'editing' : ''}`}>
+        {renderProfilePictureEditSection()}
         {!isEditing ? (
           <div className="user-details">
             <h2>{`${userInfo.name} ${userInfo.surname}`}</h2>
             <p>Email: {userInfo.email}</p>
           </div>
         ) : (
-          <div className="user-details">
-            <input type="text" name="name" placeholder="Name" value={userInfo.name} onChange={handleChange} className="form-control mb-2" />
-            <input type="text" name="surname" placeholder="Surname" value={userInfo.surname} onChange={handleChange} className="form-control mb-2" />
-            <input type="email" name="email" placeholder="Email" value={userInfo.email} onChange={handleChange} className="form-control mb-2" />
-            <input type="password" name="password" placeholder="New Password" value={userInfo.password} onChange={handleChange} className="form-control mb-2" />
-            <button onClick={handleSave} className="btn btn-success me-2">Kaydet</button>
-            <button onClick={() => setIsEditing(false)} className="btn btn-secondary">İptal</button>
-          </div>
+          <>
+            {editSection === '' && (
+              <div className="edit-buttons">
+                <button onClick={() => setEditSection('profilePicture')} className="btn btn-primary me-2">Profil Resmini Düzenle</button>
+                <button onClick={() => setEditSection('username')} className="btn btn-primary me-2">Kullanıcı Adını Düzenle</button>
+                <button onClick={() => setEditSection('password')} className="btn btn-primary me-2">Şifre Güncelle</button>
+                <button onClick={() => { setIsEditing(false); setEditSection(''); }} className="btn btn-secondary">Geri</button>
+              </div>
+            )}
+            {renderUsernameEditSection()}
+            {renderPasswordEditSection()}
+          </>
         )}
       </div>
       <div className="user-actions">

@@ -1,19 +1,72 @@
-/* UniqueDashboardNavbar.css */
-
-/* Bu CSS sınıfları sadece UniqueDashboardNavbar komponenti için geçerli olacak */
-
 .unique-navbar-toggler {
-    display: flex; /* Her zaman göster */
-  }
-  
-/* Navbar'ı üstte sabitlemek ve tam genişlikte göstermek için ek stiller */
+  display: flex; 
+}
+
 .unique-navbar {
+  /*background-color: rgb(35, 52, 71);*/
+  background-image: linear-gradient(135deg, rgba(14,54,62), rgba(60,118,134), rgba(114,172,182), rgba(141,188,196));
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.2); 
   width: 100%;
-  height: 70px;
+  height: 100px;
   z-index: 1030;
 }
 
-/* UniqueDashboardNavbar.css dosyanızda z-index değerlerini kontrol edin ve uygun şekilde ayarlayın */
-.unique-navbar {
-  z-index: 1030; /* Submenu'den daha yüksek olmalı */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  border-radius: 100%;
+  margin-top: -8px;
+  width: 80px; 
+  height: 80px;
+  margin-right: 15px; 
+}
+
+.navbar-title {
+  color: #fff;
+}
+
+.navbar-title:hover {
+  color: #fff;
+  cursor: pointer;
+}
+
+#offcanvasNavbar {
+  color: #fff;
+  background-image: linear-gradient(135deg, rgba(120, 108, 130), rgba(231, 173, 149), rgba(245,188,128));
+}
+
+.canvas-link {
+  padding: 10px 20px;
+  text-align: center;
+  margin-top: 20px;
+  border: none;
+  background-color: #1b466a; 
+  color: white; 
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 4px;
+  box-shadow: 0 0 20px #3486c1e0;
+  transition: background-color 0.3s;
+}
+
+.canvas-link:hover {
+  background-color: #3486c1; 
+  color: #fff;
+}
+
+@media (max-width: 980px) {
+  .navbar-logo {
+    border-radius: 100%;
+    margin-top: -14px;
+    width: 70px;
+    height: 70px; 
+    margin-right: 15px; 
+  }
+
+  .navbar-title {
+    font-size: 19px;
+  }
 }

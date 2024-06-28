@@ -1,9 +1,9 @@
 .home-content {
-  min-height: 100vh; /* Set minimum height to fill the viewport */
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  align-items: center; /* Center content horizontally */
+  justify-content: center;
+  align-items: center;
   margin-top: 20px;
   padding-bottom: 20px;
 }
@@ -24,21 +24,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-basis: 50%; /* Take half of the container width */
+  flex-basis: 50%; 
   padding: 10px;
 }
   
-.left-side .card { /* Assuming .card is the class used within ColorCard component */
+.left-side .card { 
   width: 100%;
   margin: 10px;
   text-align: center;
 }
   
-/* This will style the right-side smaller cards */
 .right-side {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Dikeyde ortalamak için */
+  justify-content: center;
   align-items: center;
   flex-basis: 50%;
   padding: 10px;
@@ -51,7 +50,7 @@
 }
   
 .right-side .top-cards .card {
-  width: calc(50% - 10px); /* Two cards, minus margin */
+  width: calc(50% - 10px); 
   margin: 10px;
 }
 
@@ -90,38 +89,56 @@
 }
   
 .text-side {
-  background-color: #9EB8D9; /* Örnek arkaplan rengi */
+  background-color: #9EB8D9; 
 }
 
 .image-side {
-  background-color: #EEF5FF; /* Örnek arkaplan rengi */
+  background-color: #EEF5FF; 
 }
-  
-  /* Responsive tasarım için ekstra küçük cihazlar için stil */
-  @media (max-width: 768px) {
-    .content-section {
-      flex-direction: column;
-    }
 
-    .left-side .card {
-      font-size: 25px;
-    }
+@keyframes gradientAnimation {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
 
-    .right-side .card {
-      font-size: 18px;
-    }
-  
-    .left-side, .right-side {
-      flex-basis: 100%; /* Full width on small screens */
-    }
-  
-    .right-side .top-cards, .right-side .bottom-card {
-      flex-direction: row;
-      justify-content: space-between;
-    }
 
-    .right-side .top-cards .card, .right-side .bottom-card .card {
-      width: 48%; /* Adjust for small screens, minus margin */
-      margin: 1%; /* Small margin on small screens */
-    }
-  }  
+.WelcomeText {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(270deg, #ff7e5f, #feb47b, #ff6f61, #ffc3a0);
+  background-size: 800% 800%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+
+@media (max-width: 768px) {
+  .WelcomeText {
+    font-size: 2rem; 
+    white-space: normal; 
+  }
+
+  .StyledSection {
+    flex-direction: column;
+    padding: 10px 0; 
+  }
+
+  .left-side, .right-side {
+    flex-basis: 100%;
+  }
+
+  .right-side {
+    order: 2;
+    margin-top: 20px;
+  }
+
+  .explore-button {
+    width: 100%;
+  }
+
+  .highlight {
+    font-size: 20px;
+  }
+}

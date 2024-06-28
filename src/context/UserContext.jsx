@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from './../firebaseConfig'; // Firebase Auth import et
+import { auth } from './../firebaseConfig'; 
+import { onAuthStateChanged } from 'firebase/auth';
 
 const UserContext = createContext();
 
@@ -7,24 +8,27 @@ export const useUserContext = () => useContext(UserContext);
 
 export const UserContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state'i ekle
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
-      setLoading(false); // Kullanıcı durumu güncellendiğinde loading'i false yap
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      }
+      setLoading(false);
     });
 
-    // Cleanup function
     return () => unsubscribe();
   }, []);
 
-  // Context değerini güncelle
   const contextValue = {
     currentUser,
     setCurrentUser,
-    loading, // Loading state'i context'e ekle
+    loading,
+    error,
   };
+
 
   return (
     <UserContext.Provider value={contextValue}>

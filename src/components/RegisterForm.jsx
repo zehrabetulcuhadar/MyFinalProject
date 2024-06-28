@@ -2,91 +2,101 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { db, auth } from './../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
+import { FiMail, FiLock, FiUser } from 'react-icons/fi';
 
 const RegisterForm = ({ setIsSignUp }) => {
     const navigate = useNavigate();
 
     const initialValues = {
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+      name: '',
+      surname: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
     };
   
     const validationSchema = Yup.object({
-        fullName: Yup.string().required('Adınız ve soyadınız gereklidir'),
-        email: Yup.string().email('Geçersiz email adresi').required('Email gereklidir'),
-        password: Yup.string().required('Şifre gereklidir'),
-        confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Şifreler eşleşmiyor').required('Şifre tekrar gereklidir')
+      name: Yup.string().required('Adınız gereklidir'),
+      surname: Yup.string().required('Soyadınız gereklidir'),
+      email: Yup.string().email('Geçersiz email adresi').required('Email gereklidir'),
+      password: Yup.string().required('Şifre gereklidir').min(6, 'Şifre en az 6 karakter olmalıdır'),
+      confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Şifreler eşleşmiyor').required('Şifre tekrar gereklidir')
     });
   
-    const handleSignupSubmit = (values, { setSubmitting, setErrors }) => {
-        const { email, password, fullName } = values;
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            // kullanıcı profilini Firestore'a kaydetmek için burayı güncelle
-            const userProfileRef = doc(db, 'users', user.uid, 'profile', 'profileDocument'); // Firestore path'i
-      
-            // fullName'i firstName ve lastName olarak ayırın
-            const [name, surname] = fullName.split(' ');
-            
-            // Firestore'da yeni bir profil dökümanı oluştur
-            setDoc(userProfileRef, {
-              name: name,
-              surname: surname || 'surname',
-              email: email,
-            }).then(() => {
-              navigate(`/dashboard/${user.uid}`, { state: { fromRegistration: true } });
-            });
-            
-            // Firebase Auth'da display name'i güncelle
-            updateProfile(user, {
-              displayName: fullName
-            });
-      
-          })
-          .catch((error) => {
-            setErrors({ submit: error.message });
-          })
-          .finally(() => {
-            setSubmitting(false);
+    const handleSignupSubmit = async (values, { setSubmitting, setErrors }) => {
+      const { email, password, name, surname } = values;
+      try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Firestore'da kullanıcı profilini saklama, 'profile' koleksiyonu altında rastgele bir döküman ID'si ile
+          const profileCollectionRef = collection(db, "users", user.uid, "profile");
+          await addDoc(profileCollectionRef, {
+              name,
+              surname,
+              email
           });
-      };
-      
-  
+
+          // Firebase Auth'da displayName'i güncelle
+          await updateProfile(user, {
+            displayName: `${name} ${surname}`
+          });
+
+          navigate(`/dashboard/${user.uid}`, { state: { fromRegistration: true } });
+      } catch (error) {
+          setErrors({ submit: error.message });
+      } finally {
+          setSubmitting(false);
+      }
+    };
+       
 
     return (
-        <div className="auth-form-container">
-            <h2>Kaydol</h2>
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSignupSubmit}
-            >
-                <Form>
-                    <Field name="fullName" type="text" placeholder="Adınız ve Soyadınız" className="field-input" />
-                    <ErrorMessage name="fullName" component="div" className="error-message" />
-                    
-                    <Field name="email" type="email" placeholder="Email" className="field-input" />
-                    <ErrorMessage name="email" component="div" className="error-message" />
-                    
-                    <Field name="password" type="password" placeholder="Şifre" className="field-input" />
-                    <ErrorMessage name="password" component="div" className="error-message" />
-                    
-                    <Field name="confirmPassword" type="password" placeholder="Şifreyi Onayla" className="field-input" />
-                    <ErrorMessage name="confirmPassword" component="div" className="error-message" />
-                    
-                    <button type="submit">Kaydol</button>
-                </Form>
-            </Formik>
-            <button type="button" onClick={() => setIsSignUp(false)}>
-                Zaten hesabınız var mı? Giriş yapın
-            </button>
-        </div>
+      <div>
+        <h2 className="login-title">Kaydol</h2>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSignupSubmit}
+        >
+          <Form className="formik-form">
+            <div className="input-wrapper">
+              <Field name="name" type="text" placeholder="Adınız" className="input-field" />
+              <FiUser className="input-icon" />
+              <ErrorMessage name="name" component="div" className="error-message" />
+            </div>
+            
+            <div className="input-wrapper">
+              <Field name="surname" type="text" placeholder="Soyadınız" className="input-field" />
+              <FiUser className="input-icon" />
+              <ErrorMessage name="surname" component="div" className="error-message" />
+            </div>
+
+            <div className="input-wrapper">
+              <Field name="email" type="email" placeholder="Mail adresinizi girin" className="input-field" />
+              <FiMail className="input-icon" />
+              <ErrorMessage name="email" component="div" className="error-message" />
+            </div>
+            
+            <div className="input-wrapper">
+              <Field name="password" type="password" placeholder="Şifrenizi girin" className="input-field" />
+              <FiLock className="input-icon" />
+              <ErrorMessage name="password" component="div" className="error-message" />
+            </div>
+            
+            <div className="input-wrapper">
+              <Field name="confirmPassword" type="password" placeholder="Şifreyi Onayla" className="input-field" />
+              <FiLock className="input-icon" />
+              <ErrorMessage name="confirmPassword" component="div" className="error-message" />
+            </div>
+            
+            <button type="submit" className="submit-button">Kaydol</button>
+          </Form>
+        </Formik>
+      </div>    
   )
 }
 

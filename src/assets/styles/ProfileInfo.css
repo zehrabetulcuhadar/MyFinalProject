@@ -4,32 +4,45 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #f7f7f7;
+  background-image: linear-gradient(to right, rgba(0, 24, 57, 0.2), rgba(0, 157, 255, 0.3));
+  background-repeat: no-repeat; 
+  background-attachment: fixed; 
+  background-size: cover;
+  width: 100%; 
+  overflow-x: hidden; 
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 .profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fff;
+  background-image: linear-gradient(270deg, rgba(120, 108, 130), rgba(231, 173, 149), rgba(245,188,128));
+  color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 90%;
-  max-width: 600px; /* Adjust based on your preference */
+  max-width: 600px; 
   margin: 20px auto;
+  transition: all 0.3s ease;
 }
 
 .profile-picture {
   width: 150px;
-  height: 150px; /* Make the image a perfect circle */
+  height: 150px; 
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 20px; /* Space below the profile picture */
+  margin-bottom: 20px; 
 }
 
 .user-details {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .user-details h2, .user-details p {
@@ -38,9 +51,9 @@
 }
 
 .user-details input {
-  width: calc(100% - 78px); /* Full width minus padding */
+  width: calc(100% - 78px); 
   padding: 10px;
-  margin-bottom: 10px; /* Space between inputs */
+  margin-bottom: 10px; 
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -51,6 +64,74 @@
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+}
+
+.edit-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.edit-buttons .btn {
+  flex: 1 1 45%;
+  margin: 5px;
+  text-align: center;
+}
+
+.edit-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.edit-profile-picture {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.edit-profile-picture img {
+  flex: 1;
+}
+
+.edit-profile-picture .buttons {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 20px;
+}
+
+.file-input {
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  padding: 10px 20px;
+  color: #007bff;
+  background-color: white;
+  text-align: center;
+}
+
+.file-input input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.buttons {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 20px;
 }
 
 .btn {
@@ -86,7 +167,6 @@
   color: white;
 }
 
-/* Add responsive behavior */
 @media (max-width: 768px) {
   .profile-container {
     flex-direction: column;
@@ -94,21 +174,40 @@
   }
   
   .profile-picture {
-    align-self: center; /* Center profile picture */
-    margin-bottom: 20px; /* Increase space below profile picture */
+    align-self: center; 
+    margin-bottom: 20px;
   }
 
   .user-details {
-    order: 2; /* Ensure that user details come after profile picture */
+    order: 2; 
   }
   
   .user-actions {
-    order: 3; /* Ensure actions come last */
+    order: 3; 
     flex-direction: row;
     justify-content: space-around;
   }
 
   .btn {
-    padding: 8px 12px; /* Smaller padding on mobile */
+    padding: 8px 12px;
+  }
+
+  .edit-buttons .btn {
+    flex: 1 1 100%;
+  }
+
+  .buttons {
+    margin-left: 0;
+    align-items: center;
+  }
+
+  .edit-profile-picture {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .edit-profile-picture .buttons {
+    margin-left: 0;
+    align-items: center;
   }
 }

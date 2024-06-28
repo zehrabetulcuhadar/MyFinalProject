@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import '../assets/styles/Profile.css'
-import AccountSettings from '../components/AccountSettings'
-import DeleteAccount from '../components/DeleteAccount'
-import PastReports from '../components/PastReports'
 import ProfileInfo from '../components/ProfileInfo'
 import { auth, database } from '../firebaseConfig'; 
 import { ref, onValue } from 'firebase/database';
 import { useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
+import DashboardNavbar from '../components/DashboardNavbar';
+import CopyrightBar from '../components/CopyrightBar';
 
 const Profile = () => {
   const { userId } = useParams();
@@ -29,8 +27,12 @@ const Profile = () => {
   }, []);
   
   return (
-    <div className="dashboard-container">
-      <ProfileInfo userId={userId} />
+    <div className='profile-content'>
+      <DashboardNavbar/>
+      <div className="dashboard-container">
+        <ProfileInfo userId={userId} />
+      </div>
+      <CopyrightBar/>
     </div>
   )
 }

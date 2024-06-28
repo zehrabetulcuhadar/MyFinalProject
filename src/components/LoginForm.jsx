@@ -1,17 +1,20 @@
 import React from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './../assets/styles/LoginForm.css';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from './../firebaseConfig.js'; // Firebase yapılandırmanızın olduğu dosyayı import edin
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from "firebase/auth";
+import { auth } from './../firebaseConfig.js';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FiMail, FiLock } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
 
 const LoginForm = ({ setIsSignUp }) => {
   const navigate = useNavigate();
-  const { setCurrentUser } = useUserContext(); // UserContext'ten setCurrentUser fonksiyonunu al
+  const { setCurrentUser } = useUserContext();
+  const provider = new GoogleAuthProvider();
 
   const initialValues = {
     email: '',
@@ -44,30 +47,64 @@ const LoginForm = ({ setIsSignUp }) => {
       })
       .finally(() => setSubmitting(false));
   };
-  
-  
 
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setCurrentUser(result.user);
+        navigate(`/dashboard/${result.user.uid}`);
+      })
+      .catch((error) => {
+        console.error('Google sign in error:', error);
+        toast.error('Google ile giriş yapılırken bir hata oluştu.');
+      });
+  };
+
+  const handleForgotPassword = (email) => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        toast.success('Şifre sıfırlama linki e-posta adresinize gönderildi.');
+      })
+      .catch((error) => {
+        console.error('Error sending password reset email:', error);
+        toast.error('Şifre sıfırlama e-postası gönderilirken bir hata oluştu.');
+      });
+  };
+  
   return (
-    <div className="auth-form-container">
-      <h2>Giriş Yap</h2>
+    <div className="login-form-container">
+      <h2 className="login-title">Giriş Yap</h2>
       <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleLoginSubmit}
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleLoginSubmit}
       >
-          <Form>
-              <Field name="email" type="email" placeholder="Email" className="field-input" />
-              
-              <Field name="password" type="password" placeholder="Şifre" className="field-input" />
-              
-              <button type="submit">Giriş Yap</button>
+        {({ values, isSubmitting }) => (
+          <Form className="formik-form">
+            <div className="input-wrapper">
+              <Field name="email" type="email" placeholder="Mail adresinizi girin" className="input-field" />
+              <FiMail className="input-icon" />
+            </div>
+            <ErrorMessage name="email" component="div" className="error-message" />
 
-              <a href="#" onClick={() => {/* Şifremi unuttum işlemleri */}} className="password-reset">Şifremi Unuttum</a>
+            <div className="input-wrapper">
+              <Field name="password" type="password" placeholder="Şifrenizi girin" className="input-field" />
+              <FiLock className="input-icon" />
+            </div>
+            <ErrorMessage name="password" component="div" className="error-message" />
+
+            <button onClick={handleGoogleSignIn} className="google-sign-in-button">
+              <FcGoogle className="google-icon" />
+            </button>
+
+            <div className="options-wrapper">
+              <a href="#" className="password-reset-link" onClick={() => handleForgotPassword(values.email)}>Şifremi Unuttum</a>
+            </div>
+
+            <button type="submit" className="submit-button">GİRİŞ</button>
           </Form>
+        )}
       </Formik>
-      <button type="button" onClick={() => setIsSignUp(true)}>
-          Hesabınız yok mu? Kaydolun
-      </button>
       <ToastContainer />
     </div>
   )

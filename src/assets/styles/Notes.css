@@ -1,29 +1,37 @@
 .notes-container {
   padding: 20px;
-  margin: 100px 40px 40px 40px;
+  margin: 50px 40px 40px 40px;
+  /*background-color: rgb(35, 52, 71);*/
+  background-color: rgba(60,118,134);
+  border-radius: 20px;
 }
 
 .notes-input-area {
+  /*background-color: antiquewhite;*/
+  padding: 30px;
+  justify-content: center;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
 }
 
 .notes-display-area {
-  max-height: 500px; /* Maksimum yükseklik */
-  overflow-y: auto; /* Dikey kaydırma çubuğu */
+  max-height: 500px;
+  overflow-y: auto; 
 }
 
 .text-area-custom {
-  height: 150px; /* Sabit yükseklik */
-  resize: none; /* Kullanıcının textarea'yı yeniden boyutlandırmasını engelle */
+  height: 150px; 
+  resize: none; 
 }
 
 .note-card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Kartlara hafif bir gölge efekti */
+  /*background-image: linear-gradient(135deg, rgba(0, 255, 60, 0.3), rgba(0, 157, 255, 0.3));*/
+  background-image: linear-gradient(270deg, rgba(120, 108, 130), rgba(231, 173, 149), rgba(245,188,128));
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); 
 }
 
 @media (max-width: 768px) {
-  /* Tablet ve altı ekran boyutları için */
   .notes-input-area,
   .notes-display-area {
     margin: 2px;
